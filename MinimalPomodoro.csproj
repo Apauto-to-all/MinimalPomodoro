@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Version>0.1.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <Authors>MinimalPomodoro Contributors</Authors>
+    <Description>A minimal, language-neutral Pomodoro timer for Windows.</Description>
   </PropertyGroup>
 
 </Project>

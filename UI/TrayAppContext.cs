@@ -45,6 +45,28 @@ public class TrayAppContext : ApplicationContext
         _engine.Tick += UpdateTray;
         _engine.Tick += () =>
         {
+            // Early warning notifications based on user settings
+            if (_config.EarlyWarningSecondsWork > 0 &&
+                _engine.CurrentState == PomodoroState.Working &&
+                _engine.RemainingSeconds == _config.EarlyWarningSecondsWork &&
+                _engine.TotalSeconds > _config.EarlyWarningSecondsWork + 10)
+            {
+                _notifyIcon.ShowBalloonTip(3000,
+                    Localization.Get("极简番茄钟"),
+                    string.Format(Localization.Get("工作即将结束 (剩{0}秒)"), _config.EarlyWarningSecondsWork),
+                    ToolTipIcon.Info);
+            }
+            else if (_config.EarlyWarningSecondsBreak > 0 &&
+                    (_engine.CurrentState == PomodoroState.ShortBreak || _engine.CurrentState == PomodoroState.LongBreak) &&
+                    _engine.RemainingSeconds == _config.EarlyWarningSecondsBreak &&
+                    _engine.TotalSeconds > _config.EarlyWarningSecondsBreak + 10)
+            {
+                _notifyIcon.ShowBalloonTip(3000,
+                    Localization.Get("极简番茄钟"),
+                    string.Format(Localization.Get("休息即将结束 (剩{0}秒)"), _config.EarlyWarningSecondsBreak),
+                    ToolTipIcon.Info);
+            }
+
             // Auto-save session every minute to prevent loss on crash
             if (_engine.RemainingSeconds % 60 == 0)
             {
@@ -63,9 +85,29 @@ public class TrayAppContext : ApplicationContext
         var menu = new ContextMenuStrip();
         menu.ShowImageMargin = true;
 
-        var pauseItem = new ToolStripMenuItem() { Image = IconGenerator.GetPauseIcon(), Text = Localization.Get("暂停") };
-        pauseItem.Click += (s, e) => _engine.TogglePause();
-        menu.Items.Add(pauseItem);
+        // Add custom control panel at the top
+        var panel = new TrayControlPanel(_engine, _config);
+        var host = new ToolStripControlHost(panel)
+        {
+            Margin = Padding.Empty,
+            Padding = Padding.Empty,
+            AutoSize = false,
+            Size = panel.Size
+        };
+        menu.Items.Add(host);
+        menu.Items.Add(new ToolStripSeparator());
+
+        var settingsItem = new ToolStripMenuItem() { Image = IconGenerator.GetSettingsIcon(), Text = Localization.Get("设置") };
+        settingsItem.Click += (s, e) =>
+        {
+            using var form = new SettingsForm(_config);
+            form.ShowDialog();
+            if (form.SettingsChanged)
+            {
+                Application.Restart();
+            }
+        };
+        menu.Items.Add(settingsItem);
 
         menu.Items.Add(new ToolStripSeparator());
 
@@ -108,6 +150,10 @@ public class TrayAppContext : ApplicationContext
 
         menu.Items.Add(new ToolStripSeparator());
 
+        var version = Application.ProductVersion.Split('+')[0];
+        var versionItem = new ToolStripMenuItem() { Text = $"v{version}", Enabled = false };
+        menu.Items.Add(versionItem);
+
         var exitItem = new ToolStripMenuItem() { Image = IconGenerator.GetExitIcon(), Text = Localization.Get("退出") };
         exitItem.Click += (s, e) => Exit();
         menu.Items.Add(exitItem);
@@ -115,18 +161,6 @@ public class TrayAppContext : ApplicationContext
         menu.Opening += (s, e) =>
         {
             // Update menu item states before showing
-            if (_engine.CurrentState == PomodoroState.Paused)
-            {
-                pauseItem.Image?.Dispose();
-                pauseItem.Image = IconGenerator.GetPlayIcon();
-                pauseItem.Text = Localization.Get("继续");
-            }
-            else
-            {
-                pauseItem.Image?.Dispose();
-                pauseItem.Image = IconGenerator.GetPauseIcon();
-                pauseItem.Text = Localization.Get("暂停");
-            }
             autoStartItem.Checked = _config.AutoStart;
             // update auto start icon to reflect state
             autoStartItem.Image?.Dispose();
@@ -187,7 +221,7 @@ public class TrayAppContext : ApplicationContext
 
     private void Exit()
     {
-        _engine.SaveSessionState();
+        _engine.ClearSessionState();
         ConfigManager.Save(_config);
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();

@@ -9,6 +9,8 @@ public class AppConfig
     public bool SoundEnabled { get; set; } = true;
     public bool AutoStart { get; set; } = false;
     public string? Language { get; set; }
+    public int EarlyWarningSecondsWork { get; set; } = 60;
+    public int EarlyWarningSecondsBreak { get; set; } = 30;
 
     // Session persistence
     public PomodoroState? LastState { get; set; }

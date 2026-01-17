@@ -216,6 +216,29 @@ public static class IconGenerator
         return bmp;
     }
 
+    public static Bitmap GetSettingsIcon()
+    {
+        Bitmap bmp = new Bitmap(16, 16);
+        using (Graphics g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            using (Pen p = new Pen(Color.FromArgb(100, 100, 100), 2f))
+            {
+                g.DrawEllipse(p, 3, 3, 10, 10);
+                g.DrawEllipse(p, 6, 6, 4, 4);
+                // Gear-like spikes
+                for (int i = 0; i < 8; i++)
+                {
+                    float angle = i * 45;
+                    float rad = angle * (float)Math.PI / 180f;
+                    g.DrawLine(p, 8 + (float)Math.Cos(rad) * 5, 8 + (float)Math.Sin(rad) * 5,
+                                  8 + (float)Math.Cos(rad) * 7, 8 + (float)Math.Sin(rad) * 7);
+                }
+            }
+        }
+        return bmp;
+    }
+
     public static Bitmap GetExitIcon()
     {
         Bitmap bmp = new Bitmap(16, 16);
@@ -227,6 +250,61 @@ public static class IconGenerator
                 g.DrawLine(p, 4, 4, 12, 12);
                 g.DrawLine(p, 12, 4, 4, 12);
             }
+        }
+        return bmp;
+    }
+
+    // --- Control Panel Specific Icons (Larger & Smoother) ---
+
+    public static Bitmap GetControlPlayIcon()
+    {
+        Bitmap bmp = new Bitmap(32, 32);
+        using (Graphics g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            PointF[] points = { new PointF(10, 8), new PointF(10, 24), new PointF(26, 16) };
+            g.FillPolygon(new SolidBrush(Color.FromArgb(60, 60, 60)), points);
+        }
+        return bmp;
+    }
+
+    public static Bitmap GetControlPauseIcon()
+    {
+        Bitmap bmp = new Bitmap(32, 32);
+        using (Graphics g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            Brush b = new SolidBrush(Color.FromArgb(60, 60, 60));
+            g.FillRectangle(b, 10, 8, 4, 16);
+            g.FillRectangle(b, 18, 8, 4, 16);
+        }
+        return bmp;
+    }
+
+    public static Bitmap GetControlPrevIcon()
+    {
+        Bitmap bmp = new Bitmap(32, 32);
+        using (Graphics g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            Brush b = new SolidBrush(Color.FromArgb(60, 60, 60));
+            PointF[] points = { new PointF(22, 8), new PointF(22, 24), new PointF(12, 16) };
+            g.FillPolygon(b, points);
+            g.FillRectangle(b, 8, 8, 3, 16);
+        }
+        return bmp;
+    }
+
+    public static Bitmap GetControlNextIcon()
+    {
+        Bitmap bmp = new Bitmap(32, 32);
+        using (Graphics g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            Brush b = new SolidBrush(Color.FromArgb(60, 60, 60));
+            PointF[] points = { new PointF(10, 8), new PointF(10, 24), new PointF(20, 16) };
+            g.FillPolygon(b, points);
+            g.FillRectangle(b, 21, 8, 3, 16);
         }
         return bmp;
     }

@@ -22,7 +22,19 @@ public static class Localization
             ["极简番茄钟"] = "Minimal Pomodoro",
             ["工作结束！该休息一下了。"] = "Work session finished! Time for a break.",
             ["休息结束！准备开始工作了吗？"] = "Break finished! Ready to work?",
-            ["语言"] = "Language"
+            ["语言"] = "Language",
+            ["设置"] = "Settings",
+            ["工作时长 (分钟)"] = "Work Duration (min)",
+            ["短休息时长 (分钟)"] = "Short Break (min)",
+            ["长休息时长 (分钟)"] = "Long Break (min)",
+            ["长休息间隔 (周期)"] = "Long Break Interval",
+            ["预先提醒-工作 (秒)"] = "Pre-warn Work (sec)",
+            ["预先提醒-休息 (秒)"] = "Pre-warn Break (sec)",
+            ["设置为0则禁用预警通知"] = "Set to 0 to disable pre-warning notifications",
+            ["保存"] = "Save",
+            ["应用已在运行"] = "Application is already running.",
+            ["工作即将结束 (剩{0}秒)"] = "Work session ending soon ({0}s left)",
+            ["休息即将结束 (剩{0}秒)"] = "Break session ending soon ({0}s left)"
         }
     };
 

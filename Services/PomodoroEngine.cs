@@ -31,8 +31,6 @@ public class PomodoroEngine
             RemainingSeconds = config.LastRemainingSeconds;
 
             // Recalculate TotalSeconds for progress bar
-            // We use standard durations from config. If user changed config in between, 
-            // the progress bar might look jumpy, but it's consistent.
             var baseState = (CurrentState == PomodoroState.Paused) ? PreviousState : CurrentState;
             TotalSeconds = baseState switch
             {
@@ -42,8 +40,7 @@ public class PomodoroEngine
                 _ => _config.WorkDurationMinutes * 60
             };
 
-            // Always start in paused state on launch for better UX, 
-            // but keep track of what we were doing.
+            // Always ensure we are in Paused state on startup
             if (CurrentState != PomodoroState.Paused)
             {
                 PreviousState = CurrentState;
@@ -52,7 +49,12 @@ public class PomodoroEngine
         }
         else
         {
-            ResetToWork();
+            // Initial startup or no saved session
+            CurrentState = PomodoroState.Paused;
+            PreviousState = PomodoroState.Working;
+            CurrentCycle = 1;
+            TotalSeconds = _config.WorkDurationMinutes * 60;
+            RemainingSeconds = TotalSeconds;
         }
     }
 
@@ -62,6 +64,14 @@ public class PomodoroEngine
         _config.LastPreviousState = PreviousState;
         _config.LastRemainingSeconds = RemainingSeconds;
         _config.LastCycle = CurrentCycle;
+    }
+
+    public void ClearSessionState()
+    {
+        _config.LastState = null;
+        _config.LastPreviousState = null;
+        _config.LastRemainingSeconds = 0;
+        _config.LastCycle = 1;
     }
 
     private void OnTick(object? sender, EventArgs e)
@@ -143,6 +153,58 @@ public class PomodoroEngine
             _timer.Stop();
         }
         StateChanged?.Invoke();
+    }
+
+    public void NextStage()
+    {
+        _timer.Stop();
+        if (CurrentState == PomodoroState.Working || (CurrentState == PomodoroState.Paused && PreviousState == PomodoroState.Working))
+        {
+            if (CurrentCycle >= _config.LongBreakInterval)
+            {
+                StartLongBreak();
+            }
+            else
+            {
+                StartShortBreak();
+            }
+        }
+        else if (CurrentState == PomodoroState.ShortBreak || (CurrentState == PomodoroState.Paused && PreviousState == PomodoroState.ShortBreak))
+        {
+            CurrentCycle++;
+            StartWork();
+        }
+        else if (CurrentState == PomodoroState.LongBreak || (CurrentState == PomodoroState.Paused && PreviousState == PomodoroState.LongBreak))
+        {
+            CurrentCycle = 1;
+            StartWork();
+        }
+    }
+
+    public void PreviousStage()
+    {
+        _timer.Stop();
+        if (CurrentState == PomodoroState.Working || (CurrentState == PomodoroState.Paused && PreviousState == PomodoroState.Working))
+        {
+            if (CurrentCycle > 1)
+            {
+                CurrentCycle--;
+                StartShortBreak();
+            }
+            else
+            {
+                CurrentCycle = _config.LongBreakInterval;
+                StartLongBreak();
+            }
+        }
+        else if (CurrentState == PomodoroState.ShortBreak || (CurrentState == PomodoroState.Paused && PreviousState == PomodoroState.ShortBreak))
+        {
+            StartWork();
+        }
+        else if (CurrentState == PomodoroState.LongBreak || (CurrentState == PomodoroState.Paused && PreviousState == PomodoroState.LongBreak))
+        {
+            StartWork();
+        }
     }
 
     public void Start()
