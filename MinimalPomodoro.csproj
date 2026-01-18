@@ -6,10 +6,11 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>0.1.0</Version>
+    <Version>1.0.0</Version>
+    <ApplicationIcon>Resources\app.ico</ApplicationIcon>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <Authors>MinimalPomodoro Contributors</Authors>
-    <Description>A minimal, language-neutral Pomodoro timer for Windows.</Description>
+    <Authors>Apauto-to-all</Authors>
+    <Description>一个为 Windows 设计的极简、多语言番茄钟计时器。</Description>
   </PropertyGroup>
 
 </Project>

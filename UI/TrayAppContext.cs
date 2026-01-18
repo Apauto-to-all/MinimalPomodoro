@@ -153,14 +153,34 @@ public class TrayAppContext : ApplicationContext
         // Language sub-menu
         var langMenuItem = new ToolStripMenuItem() { Image = IconGenerator.GetLanguageIcon(), Text = Localization.Get("语言") };
 
-        var zhItem = new ToolStripMenuItem() { Text = "中文" };
+        var zhItem = new ToolStripMenuItem() { Text = "简体中文" };
         zhItem.Click += (s, e) => { UpdateLanguage("zh"); };
 
         var enItem = new ToolStripMenuItem() { Text = "English" };
         enItem.Click += (s, e) => { UpdateLanguage("en"); };
 
+        var jaItem = new ToolStripMenuItem() { Text = "日本語" };
+        jaItem.Click += (s, e) => { UpdateLanguage("ja"); };
+
+        var deItem = new ToolStripMenuItem() { Text = "Deutsch" };
+        deItem.Click += (s, e) => { UpdateLanguage("de"); };
+
+        var esItem = new ToolStripMenuItem() { Text = "Español" };
+        esItem.Click += (s, e) => { UpdateLanguage("es"); };
+
+        var frItem = new ToolStripMenuItem() { Text = "Français" };
+        frItem.Click += (s, e) => { UpdateLanguage("fr"); };
+
+        var koItem = new ToolStripMenuItem() { Text = "한국어" };
+        koItem.Click += (s, e) => { UpdateLanguage("ko"); };
+
         langMenuItem.DropDownItems.Add(zhItem);
         langMenuItem.DropDownItems.Add(enItem);
+        langMenuItem.DropDownItems.Add(jaItem);
+        langMenuItem.DropDownItems.Add(koItem);
+        langMenuItem.DropDownItems.Add(deItem);
+        langMenuItem.DropDownItems.Add(esItem);
+        langMenuItem.DropDownItems.Add(frItem);
         menu.Items.Add(langMenuItem);
 
         menu.Items.Add(new ToolStripSeparator());
@@ -169,8 +189,8 @@ public class TrayAppContext : ApplicationContext
         var versionItem = new ToolStripMenuItem()
         {
             Image = IconGenerator.GetGitHubIcon(),
-            Text = $"{AppConstants.AppName} v{version}",
-            ToolTipText = Localization.Get("项目主页 (GitHub)")
+            Text = $"v{version}",
+            ToolTipText = $"{AppConstants.AppName} - {Localization.Get("项目主页 (GitHub)")}"
         };
         versionItem.Click += (s, e) =>
         {
@@ -193,6 +213,11 @@ public class TrayAppContext : ApplicationContext
             // Update language checks
             zhItem.Checked = _config.Language == "zh";
             enItem.Checked = _config.Language == "en";
+            jaItem.Checked = _config.Language == "ja";
+            koItem.Checked = _config.Language == "ko";
+            deItem.Checked = _config.Language == "de";
+            esItem.Checked = _config.Language == "es";
+            frItem.Checked = _config.Language == "fr";
         };
 
         return menu;

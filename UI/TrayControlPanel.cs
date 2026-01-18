@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Drawing.Drawing2D;
 using MinimalPomodoro.Models;
 using MinimalPomodoro.Services;

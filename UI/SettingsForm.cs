@@ -1,6 +1,3 @@
-using System;
-using System.Drawing;
-using System.Windows.Forms;
 using MinimalPomodoro.Models;
 using MinimalPomodoro.Services;
 
@@ -19,6 +16,18 @@ public class SettingsForm : Form
         _toolTip = new ToolTip();
 
         this.Text = $"{Localization.Get("极简番茄钟")} - {Localization.Get("设置")}";
+
+        // Use the application icon for the form
+        try
+        {
+            this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+        }
+        catch
+        {
+            // Fallback to generated icon if extraction fails
+            this.Icon = IconGenerator.GenerateTomatoIcon(1.0f, PomodoroState.Working);
+        }
+
         this.Size = new Size(600, 420);
         this.MinimumSize = new Size(580, 400);
         this.StartPosition = FormStartPosition.CenterScreen;
