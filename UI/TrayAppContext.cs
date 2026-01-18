@@ -51,20 +51,20 @@ public class TrayAppContext : ApplicationContext
                 _engine.RemainingSeconds == _config.EarlyWarningSecondsWork &&
                 _engine.TotalSeconds > _config.EarlyWarningSecondsWork + 10)
             {
-                _notifyIcon.ShowBalloonTip(3000,
+                ShowNotification(
                     Localization.Get("极简番茄钟"),
                     string.Format(Localization.Get("工作即将结束 (剩{0}秒)"), _config.EarlyWarningSecondsWork),
-                    ToolTipIcon.Info);
+                    isEndingSoon: true);
             }
             else if (_config.EarlyWarningSecondsBreak > 0 &&
                     (_engine.CurrentState == PomodoroState.ShortBreak || _engine.CurrentState == PomodoroState.LongBreak) &&
                     _engine.RemainingSeconds == _config.EarlyWarningSecondsBreak &&
                     _engine.TotalSeconds > _config.EarlyWarningSecondsBreak + 10)
             {
-                _notifyIcon.ShowBalloonTip(3000,
+                ShowNotification(
                     Localization.Get("极简番茄钟"),
                     string.Format(Localization.Get("休息即将结束 (剩{0}秒)"), _config.EarlyWarningSecondsBreak),
-                    ToolTipIcon.Info);
+                    isEndingSoon: true);
             }
 
             // Auto-save session every minute to prevent loss on crash
@@ -260,12 +260,47 @@ public class TrayAppContext : ApplicationContext
             _ => Localization.Get("休息结束！准备开始工作了吗？")
         };
 
-        _notifyIcon.ShowBalloonTip(3000, Localization.Get("极简番茄钟"), message, ToolTipIcon.Info);
+        ShowNotification(Localization.Get("极简番茄钟"), message, isEndingSoon: false);
 
         if (_config.SoundEnabled)
         {
             System.Media.SystemSounds.Beep.Play();
         }
+    }
+
+    private void ShowNotification(string title, string text, bool isEndingSoon)
+    {
+        string emojiHeader;
+        if (isEndingSoon)
+        {
+            // Flow mode: Arrow indicating transition
+            string nextEmoji = _engine.CurrentState == PomodoroState.Working
+                ? (_engine.CurrentCycle >= _config.LongBreakInterval ? AppConstants.LongBreakEmoji : AppConstants.ShortBreakEmoji)
+                : AppConstants.WorkEmoji;
+
+            string currentEmoji = _engine.CurrentState switch
+            {
+                PomodoroState.Working => AppConstants.WorkEmoji,
+                PomodoroState.ShortBreak => AppConstants.ShortBreakEmoji,
+                PomodoroState.LongBreak => AppConstants.LongBreakEmoji,
+                _ => "⏱️"
+            };
+
+            emojiHeader = $"{currentEmoji} ➔ {nextEmoji}";
+        }
+        else
+        {
+            // Destination mode: Show the icon of the state we are ENTERING
+            emojiHeader = _engine.CurrentState switch
+            {
+                PomodoroState.Working => (_engine.CurrentCycle >= _config.LongBreakInterval ? AppConstants.LongBreakEmoji : AppConstants.ShortBreakEmoji),
+                PomodoroState.ShortBreak or PomodoroState.LongBreak => AppConstants.WorkEmoji,
+                _ => "⏱️"
+            };
+        }
+
+        // Use ToolTipIcon.None to remove the blue "i" icon
+        _notifyIcon.ShowBalloonTip(3000, $"{emojiHeader} {title}", text, ToolTipIcon.None);
     }
 
     private void Exit()
