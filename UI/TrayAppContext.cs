@@ -78,12 +78,27 @@ public class TrayAppContext : ApplicationContext
         _engine.TimerFinished += OnTimerFinished;
 
         UpdateTray();
+
+        // Show welcome guide on first run
+        if (_config.FirstRun)
+        {
+            Task.Delay(1500).ContinueWith(_ =>
+            {
+                _notifyIcon.ShowBalloonTip(5000,
+                    Localization.Get("首次使用建议"),
+                    Localization.Get("💡 双击图标：暂停/继续\n⚙️ 右键：打开控制面板与设置"),
+                    ToolTipIcon.Info);
+                _config.FirstRun = false;
+                ConfigManager.Save(_config);
+            });
+        }
     }
 
     private ContextMenuStrip CreateContextMenu()
     {
         var menu = new ContextMenuStrip();
         menu.ShowImageMargin = true;
+        menu.ShowItemToolTips = true;
 
         // Add custom control panel at the top
         var panel = new TrayControlPanel(_engine, _config);
@@ -151,7 +166,16 @@ public class TrayAppContext : ApplicationContext
         menu.Items.Add(new ToolStripSeparator());
 
         var version = Application.ProductVersion.Split('+')[0];
-        var versionItem = new ToolStripMenuItem() { Text = $"v{version}", Enabled = false };
+        var versionItem = new ToolStripMenuItem()
+        {
+            Image = IconGenerator.GetGitHubIcon(),
+            Text = $"{AppConstants.AppName} v{version}",
+            ToolTipText = Localization.Get("项目主页 (GitHub)")
+        };
+        versionItem.Click += (s, e) =>
+        {
+            Process.Start(new ProcessStartInfo(AppConstants.GitHubUrl) { UseShellExecute = true });
+        };
         menu.Items.Add(versionItem);
 
         var exitItem = new ToolStripMenuItem() { Image = IconGenerator.GetExitIcon(), Text = Localization.Get("退出") };

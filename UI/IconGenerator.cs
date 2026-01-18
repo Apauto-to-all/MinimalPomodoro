@@ -254,6 +254,27 @@ public static class IconGenerator
         return bmp;
     }
 
+    public static Bitmap GetGitHubIcon()
+    {
+        Bitmap bmp = new Bitmap(16, 16);
+        using (Graphics g = Graphics.FromImage(bmp))
+        {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            using (Brush b = new SolidBrush(Color.FromArgb(40, 40, 40)))
+            {
+                // Simple representation of a GitHub-like silhouette
+                g.FillEllipse(b, 2, 2, 12, 12);
+                using (Brush bg = new SolidBrush(Color.White))
+                {
+                    // A tiny dot for the "eye/ear" shape to make it recognizable
+                    g.FillEllipse(bg, 5, 5, 6, 8);
+                }
+                g.FillEllipse(b, 6, 7, 4, 7);
+            }
+        }
+        return bmp;
+    }
+
     // --- Control Panel Specific Icons (Larger & Smoother) ---
 
     public static Bitmap GetControlPlayIcon()

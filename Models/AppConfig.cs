@@ -11,6 +11,7 @@ public class AppConfig
     public string? Language { get; set; }
     public int EarlyWarningSecondsWork { get; set; } = 60;
     public int EarlyWarningSecondsBreak { get; set; } = 30;
+    public bool FirstRun { get; set; } = true;
 
     // Session persistence
     public PomodoroState? LastState { get; set; }
